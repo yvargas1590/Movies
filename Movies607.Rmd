@@ -7,11 +7,10 @@ output:
   pdf_document: default
 ---
 
-
 ```{r}
-
-library("RMySQL")
+library(RMySQL)
 ```
+
 
 ```{r}
 con <- dbConnect(
@@ -22,61 +21,54 @@ con <- dbConnect(
   host = "data607sql.mysql.database.azure.com"
 )
 
-```
-
-
-```{r}
 data <- dbGetQuery(con, "SELECT * FROM movie_ratings")
 
-```
-
-```{r}
-data <- dbGetQuery(con, "SELECT * FROM movie_ratings")
-```
-```{r}
 dbDisconnect(con)
+
+print(data)
 ```
 
 
 ```{r}
-print(data)
+if (is.data.frame(data) | is.matrix(data)) {
+ 
 
-# Check if df is a dataframe or matrix
-if (is.data.frame(df) || is.matrix(df)) {
+  numeric_columns <- sapply(data, is.numeric)
   
-  # Check if there are missing values in df
-  if (anyNA(df)) {
+  if (any(numeric_columns)) {
     
-    # Impute missing values with average ratings
-    avg_ratings <- rowMeans(df, na.rm = TRUE)
-    df_imputed <- df
-    df_imputed[is.na(df_imputed)] <- avg_ratings[is.na(df_imputed)]
-    
-    # Check the imputed dataframe
-    print(df_imputed)
-    
+    avg_ratings <- colMeans(data[, numeric_columns], na.rm = TRUE)
+    data_imputed <- data
+    data_imputed[, numeric_columns][is.na(data_imputed[, numeric_columns])] <- avg_ratings[is.na(data_imputed[, numeric_columns])]
   } else {
-    print("No missing values found in the dataframe.")
-  }
-  
-} else {
-  print("df should be a dataframe or matrix.")
+   
+   }
 }
 
-# This code checks if the input is a dataframe or matrix. If it is, it checks if there are any missing values. If there are, it calculates the average rating for each movie and replaces the missing values with those averages. Finally, it prints the updated dataframe. If there are no missing values, it prints a message saying so.
+```
 
-
-# Bonus Challenge Questions:
-
-# 1. Using survey software to gather information can make the data collection process more organized and efficient. Platforms like Google Forms can be used to create surveys and collect responses automatically.
-
-# 2. To share code without revealing the password, you can use environment variables or store the password in a separate configuration file that is not shared publicly.
-
-# 3. Exploring different approaches to data cleaning and analysis can improve the quality and accuracy of the results. For example, using data transformations, outlier detection, or advanced imputation methods can enhance the data analysis process.
-
-# 4. Creating a normalized set of tables that correspond to the relationship between movie viewing friends and the movies being rated can improve data organization and reduce data redundancy. This can be achieved by dividing the data into separate tables for movies, friends, and ratings with appropriate foreign key relationships.
-
-# 5. Standardizing ratings can be beneficial in certain scenarios, especially when comparing ratings across multiple movies or aggregating ratings from different sources. This can be done by converting ratings to a common scale, such as a range from 0 to 1 or using z-scores. Implementing standardization in MySQL and R will depend on the specific approach chosen for standardization.
+  
+```{r}
+if (any(is.na(data_imputed))) {
+  print(data_imputed)
+} else {
+  print("No missing values found in the data frame.")
+}
 
 ```
+
+
+
+### Bonus Challenge Questions:
+
+### 1. Using survey software to gather information can make the data collection process more organized and efficient. Platforms like Google Forms can be used to create surveys and collect responses automatically.
+
+### 2. To share code without revealing the password, you can use environment variables or store the password in a separate configuration file that is not shared publicly.
+
+### 3. Exploring different approaches to data cleaning and analysis can improve the quality and accuracy of the results. For example, using data transformations, outlier detection, or advanced imputation methods can enhance the data analysis process.
+
+### 4. Creating a normalized set of tables that correspond to the relationship between movie viewing friends and the movies being rated can improve data organization and reduce data redundancy. This can be achieved by dividing the data into separate tables for movies, friends, and ratings with appropriate foreign key relationships.
+
+### 5. Standardizing ratings can be beneficial in certain scenarios, especially when comparing ratings across multiple movies or aggregating ratings from different sources. This can be done by converting ratings to a common scale, such as a range from 0 to 1 or using z-scores. Implementing standardization in MySQL and R will depend on the specific approach chosen for standardization.
+
 
